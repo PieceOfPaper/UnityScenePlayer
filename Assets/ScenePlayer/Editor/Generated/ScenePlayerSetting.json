@@ -1,0 +1,16 @@
+﻿{
+    "menuItems": [
+        {
+            "name": "Sample Scene 1",
+            "scenePath": "Assets/Scenes/SampleScene 1.unity"
+        },
+        {
+            "name": "샘플씬2",
+            "scenePath": "Assets/Scenes/SampleScene 2.unity"
+        },
+        {
+            "name": "SC3",
+            "scenePath": "Assets/Scenes/SampleScene 3.unity"
+        }
+    ]
+}
