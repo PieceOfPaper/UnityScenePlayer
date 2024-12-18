@@ -1,10 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 
 namespace ScenePlayer
 {
@@ -32,8 +29,15 @@ namespace ScenePlayer
         [MenuItem("Scene Player/Play 1st Scene _F5", false, 0)]
         private static void PlayFirstScene() => Utility.Play(EditorBuildSettings.scenes[0].path);
 
-        [MenuItem("Scene Player/Open Menu Items Editor", false, 100)]
-        private static void Open()
+        [MenuItem("Scene Player/Open Player", false, 100)]
+        private static void OpenPlayer()
+        {
+            var editor = GetWindow(typeof(PlayerEditor), true, "Scene Player");
+            editor.Show();
+        }
+
+        [MenuItem("Scene Player/Open Menu Items Editor", false, 101)]
+        private static void OpenMenuItemsEditor()
         {
             var editor = GetWindow(typeof(MenuItemsEditor), true, "Scene Player Menu Items Editor");
             editor.Show();
@@ -88,7 +92,7 @@ namespace ScenePlayer
                 if (string.IsNullOrEmpty(directoryPath) == false && System.IO.Directory.Exists(directoryPath) == false)
                     System.IO.Directory.CreateDirectory(directoryPath);
                 
-                System.IO.File.WriteAllText(MENUITEMS_SETTING_PATH, JsonUtility.ToJson(setting, true), Encoding.UTF8);
+                System.IO.File.WriteAllText(MENUITEMS_SETTING_PATH, JsonUtility.ToJson(setting, true), System.Text.Encoding.UTF8);
 
                 var strBuilder = new System.Text.StringBuilder();
                 for (int i = 0; i < setting.menuItems.Count; i ++)
@@ -105,7 +109,7 @@ namespace ScenePlayer
                     System.IO.Directory.CreateDirectory(directoryPath);
                 System.IO.File.WriteAllText(MENUITEMS_CODE_PATH, 
                     MENUITEMS_CODE_TEMPLATE.Replace("%MENUITEMS%", strBuilder.ToString()),
-                    Encoding.UTF8);
+                    System.Text.Encoding.UTF8);
                 
                 AssetDatabase.Refresh();
             }

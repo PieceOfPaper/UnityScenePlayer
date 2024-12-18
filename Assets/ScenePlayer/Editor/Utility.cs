@@ -31,7 +31,7 @@ namespace ScenePlayer
                 if (scene.isDirty == true)
                 {
                     var option = EditorUtility.DisplayDialogComplex("Scene Player",
-                        $"{scene.name} Scene has been modified.\nDo you want to save the changes you made before playing?",
+                        $"{scene.name} Scene has been modified.\nDo you want to save the changes you made before opening?",
                         "Save",
                         "Cancel",
                         "Don't Save");
