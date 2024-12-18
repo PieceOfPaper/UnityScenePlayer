@@ -8,96 +8,42 @@ using UnityEditor.SceneManagement;
 
 namespace ScenePlayer
 {
-    [System.Serializable]
-    public struct ScenePlayerMenuItem
-    {
-        public string name;
-        public string scenePath;
-    }
     
     [System.Serializable]
-    public class ScenePlayerSetting
+    public class MenuItemsSetting
     {
-        public List<ScenePlayerMenuItem> menuItems = new List<ScenePlayerMenuItem>();
+        [System.Serializable]
+        public struct MenuItemData
+        {
+            public string name;
+            public string scenePath;
+        }
+        
+        public List<MenuItemData> menuItems = new List<MenuItemData>();
     }
     
-    public class ScenePlayerEditor : EditorWindow
+    public class MenuItemsEditor : EditorWindow
     {
         #region Default Menu Items
 
         [MenuItem("Scene Player/Play 1st Scene _F5", true)]
-        private static bool ValidatePlayFirstScene() => IsValidPlay() && EditorBuildSettings.scenes.Length > 0;
+        private static bool ValidatePlayFirstScene() => Utility.IsValidPlay() && EditorBuildSettings.scenes.Length > 0;
 
         [MenuItem("Scene Player/Play 1st Scene _F5", false, 0)]
-        private static void PlayFirstScene() => Play(EditorBuildSettings.scenes[0].path);
+        private static void PlayFirstScene() => Utility.Play(EditorBuildSettings.scenes[0].path);
 
-        [MenuItem("Scene Player/Open Editor", false, 100)]
+        [MenuItem("Scene Player/Open Menu Items Editor", false, 100)]
         private static void Open()
         {
-            var editor = GetWindow(typeof(ScenePlayerEditor), true, "Scene Player Editor");
+            var editor = GetWindow(typeof(MenuItemsEditor), true, "Scene Player Menu Items Editor");
             editor.Show();
         }
 
         #endregion
 
 
-        #region Static Methods
-
-        public static bool IsValidPlay()
-        {
-            if (EditorApplication.isPlayingOrWillChangePlaymode == true)
-                return false;
-
-            if (EditorApplication.isCompiling == true)
-                return false;
-
-            return true;
-        }
-
-        public static void Play(string scenePath)
-        {
-            if (IsValidPlay() == false)
-                return;
-
-            for (int i = 0; i < SceneManager.sceneCount; i ++)
-            {
-                var scene = SceneManager.GetSceneAt(i);
-                if (scene.isLoaded == false) continue;
-
-                if (scene.isDirty == true)
-                {
-                    var option = EditorUtility.DisplayDialogComplex("Scene Player",
-                        $"{scene.name} Scene has been modified.\nDo you want to save the changes you made before playing?",
-                        "Save",
-                        "Cancel",
-                        "Don't Save");
-
-                    if (option == 0)
-                    {
-                        //Save
-                        EditorSceneManager.SaveScene(scene);
-                    }
-                    else if (option == 1)
-                    {
-                        //Cancel
-                        return;
-                    }
-                    else if (option == 2)
-                    {
-                        //Don't Save
-                    }
-                }
-            }
-
-            EditorSceneManager.OpenScene(scenePath);
-            EditorApplication.isPlaying = true;
-        }
-
-        #endregion
-
-
-        private const string MENUITEMS_CODE_PATH = "Assets/ScenePlayer/Editor/Generated/ScenePlayerMenuItems.cs";
-        private const string MENUITEMS_SETTING_PATH = "Assets/ScenePlayer/Editor/Generated/ScenePlayerSetting.json";
+        private const string MENUITEMS_CODE_PATH = "Assets/ScenePlayer/Editor/Generated/MenuItems.cs";
+        private const string MENUITEMS_SETTING_PATH = "Assets/ScenePlayer/Editor/Generated/MenuItemsSetting.json";
 
         private const string MENUITEMS_CODE_TEMPLATE = @"using UnityEditor;
 namespace ScenePlayer
@@ -110,13 +56,12 @@ namespace ScenePlayer
 ";
         private const string MENUITEMS_MENU_CODE_TEMPLATE = @"
         [MenuItem(""Scene Player/[%INDEX%] Play %NAME% Scene"", true)]
-        private static bool ValidatePlayScene_%INDEX%() => ScenePlayerEditor.IsValidPlay();
+        private static bool ValidatePlayScene_%INDEX%() => Utility.IsValidPlay();
         [MenuItem(""Scene Player/[%INDEX%] Play %NAME% Scene"", false, %PRIORITY%)]
-        private static void PlayScene_%INDEX%() => ScenePlayerEditor.Play(""%PATH%"");";
+        private static void PlayScene_%INDEX%() => Utility.Play(""%PATH%"");";
 
-        public ScenePlayerSetting setting;
+        public MenuItemsSetting setting;
         public Vector2 scroll;
-        public bool foldoutMenuItems = false;
 
         private Dictionary<string, SceneAsset> m_CacnedSceneAssets = new Dictionary<string, SceneAsset>();
         
@@ -126,22 +71,13 @@ namespace ScenePlayer
             {
                 var textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(MENUITEMS_SETTING_PATH);
                 if (textAsset != null)
-                    setting = JsonUtility.FromJson<ScenePlayerSetting>(textAsset.text);
+                    setting = JsonUtility.FromJson<MenuItemsSetting>(textAsset.text);
                 else
-                    setting = new ScenePlayerSetting();
+                    setting = new MenuItemsSetting();
             }
 
             scroll = EditorGUILayout.BeginScrollView(scroll);
-            foldoutMenuItems = EditorGUILayout.BeginFoldoutHeaderGroup(foldoutMenuItems, "Menu Items");
-            if (foldoutMenuItems)
-            {
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Space(10f);
-                EditorGUILayout.BeginVertical();
-                OnGUI_MenuItems();
-                EditorGUILayout.EndVertical();
-                EditorGUILayout.EndHorizontal();
-            }
+            OnGUI_MenuItems();
             EditorGUILayout.EndFoldoutHeaderGroup();
             EditorGUILayout.EndScrollView();
 
@@ -211,7 +147,7 @@ namespace ScenePlayer
             }
             if (GUILayout.Button("+"))
             {
-                setting.menuItems.Add(new ScenePlayerMenuItem());
+                setting.menuItems.Add(new MenuItemsSetting.MenuItemData());
             }
         }
     }
