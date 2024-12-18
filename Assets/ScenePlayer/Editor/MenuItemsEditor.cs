@@ -145,7 +145,10 @@ namespace ScenePlayer
                 setting.menuItems[i] = data;
                 if (GUILayout.Button("X", GUILayout.ExpandWidth(false)))
                 {
-                    setting.menuItems.RemoveAt(i);
+                    if (EditorUtility.DisplayDialog("Scene Player", $"Delete this item?\nName: {data.name}", "Ok", "Cancel") == true)
+                    {
+                        setting.menuItems.RemoveAt(i);
+                    }
                 }
                 EditorGUILayout.EndHorizontal();
             }

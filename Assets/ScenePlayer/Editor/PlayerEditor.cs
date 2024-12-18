@@ -142,8 +142,11 @@ namespace ScenePlayer
                         Utility.Play(data.scenePath);
                 if (GUILayout.Button("X", GUILayout.ExpandWidth(false)))
                 {
-                    setting.customScenes.RemoveAt(i);
-                    isModifiedSetting = true;
+                    if (EditorUtility.DisplayDialog("Scene Player", $"Delete this item?\nPath: {data.scenePath}", "Ok", "Cancel") == true)
+                    {
+                        setting.customScenes.RemoveAt(i);
+                        isModifiedSetting = true;
+                    }
                 }
                 EditorGUILayout.EndHorizontal();
             }
