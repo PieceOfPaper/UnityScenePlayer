@@ -2,10 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using UnityEditor.ShortcutManagement;
-using SceneAsset = UnityEditor.SceneAsset;
 
 namespace ScenePlayer
 {
@@ -60,9 +59,9 @@ namespace ScenePlayer
             if (IsValidPlay() == false)
                 return;
 
-            for (int i = 0; i < EditorSceneManager.sceneCount; i ++)
+            for (int i = 0; i < SceneManager.sceneCount; i ++)
             {
-                var scene = EditorSceneManager.GetSceneAt(i);
+                var scene = SceneManager.GetSceneAt(i);
                 if (scene.isLoaded == false) continue;
 
                 if (scene.isDirty == true)
@@ -107,7 +106,8 @@ namespace ScenePlayer
     {
 %MENUITEMS%
     }
-}";
+}
+";
         private const string MENUITEMS_MENU_CODE_TEMPLATE = @"
         [MenuItem(""Scene Player/[%INDEX%] Play %NAME% Scene"", true)]
         private static bool ValidatePlayScene_%INDEX%() => ScenePlayerEditor.IsValidPlay();
@@ -117,7 +117,6 @@ namespace ScenePlayer
         public ScenePlayerSetting setting;
         public Vector2 scroll;
         public bool foldoutMenuItems = false;
-        public bool foldoutLocalMenuItems = false;
 
         private Dictionary<string, SceneAsset> m_CacnedSceneAssets = new Dictionary<string, SceneAsset>();
         
